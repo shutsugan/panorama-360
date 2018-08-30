@@ -8,7 +8,13 @@ A Panorama with the ability to create info pointers using ThreeJs
 npm install -g http-server
 ```
 
-and run http://127.0.0.1:8080/ in the browser
+clone the repo, cd in to it and run this command
+```shell
+http-server
+```
+
+to see the demo 
+enter http://127.0.0.1:8080/ in the browser
 
 ### App screenshot
 
