@@ -3,6 +3,74 @@ const tooltip = document.querySelector('.tooltip');
 const reyCaster = new THREE.Raycaster();
 let tooltip_active = false;
 
+class Scene {
+    constructor(image, points) {
+        this.image = image;
+        this.points = points;
+        this.sprites = [];
+        this.scene = null;
+    }
+
+    createScene(scene) {
+        //add sphere
+        this.scene = scene;
+        const geometry = new THREE.SphereGeometry(50, 32, 32);
+        const textureLoader = new THREE.TextureLoader();
+
+        const texture = textureLoader.load(this.image);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.repeat.x = -1;
+
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            side: THREE.DoubleSide
+        });
+
+        this.sphere = new THREE.Mesh(geometry, material);
+        this.scene.add(this.sphere);
+        this.points.forEach(point => {
+            this.addTooltip(point.position, point.name);
+        });
+    }
+
+    addPoint(point) {
+        this.points.push(point);
+    }
+
+    addTooltip(position, name) {
+
+        const spriteMap = new THREE
+            .TextureLoader()
+            .load('info.png');
+
+        const spriteMaterial = new THREE
+            .SpriteMaterial({ map: spriteMap });
+
+        const sprite = new THREE
+            .Sprite(spriteMaterial);
+
+        sprite.name = name;
+
+
+        sprite
+            .position
+            .copy(
+                position
+                    .clone()
+                    .normalize()
+                    .multiplyScalar(20)
+            );
+
+        sprite
+            .scale
+            .multiplyScalar(2);
+
+
+        this.scene.add(sprite);
+        this.sprites.push(sprite);
+    }
+}
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
     75, 
@@ -19,21 +87,19 @@ controls.enableZoom = false;
 camera.position.set(1, 0, 0);
 controls.update();
 
-//add sphere
-const geometry = new THREE.SphereGeometry(50, 32, 32);
-const textureLoader = new THREE.TextureLoader();
+const s = new Scene('360_3.jpg', []);
+const s1 = new Scene('360_1.jpg', []);
 
-const texture = textureLoader.load('360_3.jpg');
-texture.wrapS = THREE.RepeatWrapping;
-texture.repeat.x = -1;
-
-const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    side: THREE.DoubleSide
+s.addPoint({
+    position: new THREE.Vector3(
+        48.747255204211896,
+        9.523514720448256,
+        3.312726318241995
+    ),
+    name: 'Tree'
 });
 
-const sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
+s.createScene(scene);
 
 //render
 const renderer = new THREE.WebGLRenderer();
@@ -43,13 +109,7 @@ renderer.setSize(
 );
 
 container.appendChild(renderer.domElement);
-
 animate();
-addTooltip(new THREE.Vector3(
-    48.747255204211896, 
-    9.523514720448256, 
-    3.312726318241995
-), 'Tree');
 
 //Event handling
 addEventListener('resize', onResize);
@@ -71,37 +131,6 @@ function onResize() {
     camera.updateProjectionMatrix();
 }
 
-//tooltip
-function addTooltip(position, name) {
-    const spriteMap = new THREE
-        .TextureLoader()
-        .load('info.png');
-
-    const spriteMaterial = new THREE
-        .SpriteMaterial({map: spriteMap});
-
-    const sprite = new THREE
-        .Sprite(spriteMaterial);
-
-    sprite.name = name;
-
-    sprite
-        .position
-        .copy(
-            position
-                .clone()
-                .normalize()
-                .multiplyScalar(20)
-        );
-
-    sprite
-        .scale
-        .multiplyScalar(2);
-
-
-    scene.add(sprite);
-}
-
 function onClick(event) {
     let mouse = new THREE.Vector2(
         (event.clientX / window.innerWidth) * 2 - 1,
@@ -112,7 +141,9 @@ function onClick(event) {
 
     let intersects = reyCaster.intersectObjects(scene.children);
     intersects.forEach(intersect => {
-        if (intersect.object.type === 'Sprite') console.log(intersect.object.name);
+        if (intersect.object.type === 'Sprite') {
+            console.log('clicked...');
+        }
     })
 
     //let intersect = reyCaster.intersectObject(sphere);
