@@ -3,11 +3,14 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 
 //add sphere controls
 const controls = new THREE.OrbitControls(camera);
-camera.position.set(200, 0, 0);
+camera.position.set(1, 0, 0);
 controls.update();
 
 const geometry = new THREE.SphereGeometry(50, 32, 32);
-const material = new THREE.MeshBasicMaterial({color: 0xFFFF00});
+const material = new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    side: THREE.DoubleSide
+});
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
