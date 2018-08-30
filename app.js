@@ -11,11 +11,16 @@ controls.update();
 
 const geometry = new THREE.SphereGeometry(50, 32, 32);
 const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('360.jpg')
+
+const texture = textureLoader.load('360_2.jpg');
+texture.wrapS = THREE.RepeatWrapping;
+texture.repeat.x = -1;
+
 const material = new THREE.MeshBasicMaterial({
     map: texture,
     side: THREE.DoubleSide
 });
+
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
